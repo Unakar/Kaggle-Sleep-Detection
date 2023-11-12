@@ -1,0 +1,4 @@
+name: Spec2DCNN
+params:
+  encoder_name: resnet34
+  encoder_weights: imagenet
