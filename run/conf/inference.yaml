@@ -24,8 +24,8 @@ weight:
   run_name: single
 
 seed: 42
-duration: 5760 # durationは32の倍数
-downsample_rate: 2 # durationをdownsample_rateで割った値がnum_framesになる
+duration: 5760 # duration是32的倍数
+downsample_rate: 2 #  将duration除以downsample_rate得到的值
 upsample_rate: 1
 batch_size: 32
 num_workers: 2
