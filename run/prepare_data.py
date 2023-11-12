@@ -48,6 +48,10 @@ def to_coord(x: pl.Expr, max_: int, name: str) -> list[pl.Expr]:
 def deg_to_rad(x: pl.Expr) -> pl.Expr:
     return np.pi / 180 * x
 
+# TODO:对数据做高斯平滑操作
+def Guassianize(x:pl.Expr)->pl.Expr :
+    pass
+
 
 def add_feature(series_df: pl.DataFrame) -> pl.DataFrame:
     series_df = (
