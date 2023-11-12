@@ -9,3 +9,6 @@
 在/run文件夹下运行此项目,/run/conf通过yaml完成模型配置，具体模型实现在/src目录下
 
 暂时没有使用时序模型的SOTA，后续学习后尝试接入
+
+
+本地训练请修改/run/conf/dir/local.yaml中的数据集路径!!
