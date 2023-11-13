@@ -6,10 +6,8 @@ import numpy as np
 import polars as pl
 from tqdm import tqdm
 
-import sys
-sys.path.append("../src")
-from conf import PrepareDataConfig
-from utils.common import trace
+from src.conf import PrepareDataConfig
+from src.utils.common import trace
 
 SERIES_SCHEMA = {
     "series_id": pl.Utf8,

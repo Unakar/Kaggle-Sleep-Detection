@@ -21,13 +21,13 @@ defaults:
 seed: 42
 exp_name: dummy
 batch_size: 32
-num_workers: 8
+num_workers: 24
 duration: 5760 # duration * 5 = 秒数
 downsample_rate: 2
 upsample_rate: 1
 
 trainer:
-  epochs: 50
+  epochs: 30
   accelerator: auto
   use_amp: true
   debug: false
@@ -40,7 +40,7 @@ trainer:
 dataset:
   name: seg
   batch_size: 64
-  num_workers: 24
+  num_workers: 8
   offset: 10
   sigma: 10
   bg_sampling_rate: 0.5
@@ -50,7 +50,7 @@ aug:
   mixup_alpha: 0.4
   cutmix_prob: 0.0
   cutmix_alpha: 0.4
-  
+
 # post_process
 pp:
   score_th: 0.02
@@ -78,8 +78,8 @@ features:
 
 # optimizer
 optimizer:
-  lr: 0.0005
+  lr: 0.0001
 
 # scheduler
 scheduler:
-  num_warmup_steps: 0
+  num_warmup_steps: 10
