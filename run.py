@@ -10,7 +10,7 @@ libraries = [
     'hydra-core --upgrade',
     'polars',
     'transformers',
-    '-U ''w''andb>=0.12.10'
+    "-U 'w'andb>=0.12.10"
 ]
 
 # 循环安装库
