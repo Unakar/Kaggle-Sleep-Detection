@@ -6,9 +6,10 @@ import polars as pl
 import torch
 from torch.utils.data import Dataset
 from torchvision.transforms.functional import resize
-
-from src.conf import InferenceConfig, TrainConfig
-from src.utils.common import nearest_valid_size, negative_sampling, random_crop
+import sys
+sys.path.append("../")
+from conf import InferenceConfig, TrainConfig
+from utils.common import nearest_valid_size, negative_sampling, random_crop
 
 
 ###################

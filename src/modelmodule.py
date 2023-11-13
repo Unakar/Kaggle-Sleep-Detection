@@ -7,12 +7,12 @@ import torch.optim as optim
 from pytorch_lightning import LightningModule
 from transformers import get_cosine_schedule_with_warmup
 
-from src.conf import TrainConfig
-from src.models.base import ModelOutput
-from src.models.common import get_model
-from src.utils.common import nearest_valid_size
-from src.utils.metrics import event_detection_ap
-from src.utils.post_process import post_process_for_seg
+from conf import TrainConfig
+from models.base import ModelOutput
+from models.common import get_model
+from utils.common import nearest_valid_size
+from utils.metrics import event_detection_ap
+from utils.post_process import post_process_for_seg
 
 
 class PLSleepModel(LightningModule):
