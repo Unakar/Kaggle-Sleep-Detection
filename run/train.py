@@ -69,7 +69,6 @@ def main(cfg: TrainConfig):
         callbacks=[checkpoint_cb, lr_monitor, progress_bar, model_summary],
         # logger=pl_logger,
         
-        # resume_from_checkpoint=resume_from,
         num_sanity_val_steps=0,
         log_every_n_steps=int(len(datamodule.train_dataloader()) * 0.1),
         sync_batchnorm=True,
@@ -77,7 +76,8 @@ def main(cfg: TrainConfig):
     )
 
     trainer.fit(model, datamodule=datamodule)
-
+    # ckpt_path = "/home/aistudio/output/train/dummy/single/lightning_logs/.../checkpoints/**.ckpt"
+    # trainer.fit(model, datamodule=datamodule, ckpt_path=ckpt_path) //提供加载断点的方式
     # load best weights
     model = model.load_from_checkpoint(
         checkpoint_cb.best_model_path,
