@@ -118,3 +118,8 @@ class PLSleepModel(LightningModule):
             optimizer, num_training_steps=self.trainer.max_steps, **self.cfg.scheduler
         )
         return [optimizer], [{"scheduler": scheduler, "interval": "step"}]
+
+    def on_epoch_end(self):
+        self.epoch_count += 1
+        if self.epoch_count % 10 == 0:
+            torch.save(self.model.state_dict(), f"model_epoch_{self.epoch_count}.pth")

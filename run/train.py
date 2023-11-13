@@ -1,139 +1,98 @@
-from typing import Union
+import logging
+from pathlib import Path
 
-import torch.nn as nn
+import hydra
+import torch
+from pytorch_lightning import Trainer, seed_everything
+from pytorch_lightning.callbacks import (
+    LearningRateMonitor,
+    ModelCheckpoint,
+    RichModelSummary,
+    RichProgressBar,
+)
+from pytorch_lightning.loggers import WandbLogger
+import sys
+sys.path.append("../src")
+from conf import TrainConfig
+from datamodule import SleepDataModule
+from modelmodule import PLSleepModel
 
-from src.conf import DecoderConfig, FeatureExtractorConfig, InferenceConfig, TrainConfig
-from src.models.base import BaseModel
-from src.models.decoder.lstmdecoder import LSTMDecoder
-from src.models.decoder.mlpdecoder import MLPDecoder
-from src.models.decoder.transformerdecoder import TransformerDecoder
-from src.models.decoder.unet1ddecoder import UNet1DDecoder
-from src.models.detr2D import DETR2DCNN
-from src.models.feature_extractor.cnn import CNNSpectrogram
-from src.models.feature_extractor.lstm import LSTMFeatureExtractor
-from src.models.feature_extractor.panns import PANNsFeatureExtractor
-from src.models.feature_extractor.spectrogram import SpecFeatureExtractor
-from src.models.spec1D import Spec1D
-from src.models.spec2Dcnn import Spec2DCNN
-
-FEATURE_EXTRACTOR_TYPE = Union[
-    CNNSpectrogram, PANNsFeatureExtractor, LSTMFeatureExtractor, SpecFeatureExtractor
-]
-DECODER_TYPE = Union[UNet1DDecoder, LSTMDecoder, TransformerDecoder, MLPDecoder]
-
-
-def get_feature_extractor(
-    cfg: FeatureExtractorConfig, feature_dim: int, num_timesteps: int
-) -> FEATURE_EXTRACTOR_TYPE:
-    feature_extractor: FEATURE_EXTRACTOR_TYPE
-    if cfg.name == "CNNSpectrogram":
-        feature_extractor = CNNSpectrogram(
-            in_channels=feature_dim, output_size=num_timesteps, **cfg.params
-        )
-    elif cfg.name == "PANNsFeatureExtractor":
-        feature_extractor = PANNsFeatureExtractor(
-            in_channels=feature_dim, output_size=num_timesteps, conv=nn.Conv1d, **cfg.params
-        )
-    elif cfg.name == "LSTMFeatureExtractor":
-        feature_extractor = LSTMFeatureExtractor(
-            in_channels=feature_dim, out_size=num_timesteps, **cfg.params
-        )
-    elif cfg.name == "SpecFeatureExtractor":
-        feature_extractor = SpecFeatureExtractor(
-            in_channels=feature_dim, out_size=num_timesteps, **cfg.params
-        )
-    else:
-        raise ValueError(f"Invalid feature extractor name: {cfg.name}")
-
-    return feature_extractor
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s:%(name)s - %(message)s"
+)
+LOGGER = logging.getLogger(Path(__file__).name)
 
 
-def get_decoder(
-    cfg: DecoderConfig, n_channels: int, n_classes: int, num_timesteps: int
-) -> DECODER_TYPE:
-    decoder: DECODER_TYPE
-    if cfg.name == "UNet1DDecoder":
-        decoder = UNet1DDecoder(
-            n_channels=n_channels,
-            n_classes=n_classes,
-            duration=num_timesteps,
-            **cfg.params,
-        )
-    elif cfg.name == "LSTMDecoder":
-        decoder = LSTMDecoder(
-            input_size=n_channels,
-            n_classes=n_classes,
-            **cfg.params,
-        )
-    elif cfg.name == "TransformerDecoder":
-        decoder = TransformerDecoder(
-            input_size=n_channels,
-            n_classes=n_classes,
-            **cfg.params,
-        )
-    elif cfg.name == "MLPDecoder":
-        decoder = MLPDecoder(n_channels=n_channels, n_classes=n_classes)
-    else:
-        raise ValueError(f"Invalid decoder name: {cfg.name}")
+@hydra.main(config_path="conf", config_name="train", version_base="1.2")
+def main(cfg: TrainConfig):
+    seed_everything(cfg.seed)
 
-    return decoder
+    # init lightning model
+    datamodule = SleepDataModule(cfg)
+    LOGGER.info("Set Up DataModule")
+    model = PLSleepModel(
+        cfg, datamodule.valid_event_df, len(cfg.features), len(cfg.labels), cfg.duration
+    )
+
+    # set callbacks
+    checkpoint_cb = ModelCheckpoint(
+        verbose=True,
+        monitor=cfg.trainer.monitor,
+        mode=cfg.trainer.monitor_mode,
+        save_top_k=1,
+        save_last=False,
+    )
+    lr_monitor = LearningRateMonitor("epoch")
+    progress_bar = RichProgressBar()
+    model_summary = RichModelSummary(max_depth=2)
+
+    # init experiment logger
+    pl_logger = WandbLogger(
+        name=cfg.exp_name,
+        project="child-mind-institute-detect-sleep-states",
+    )
+    pl_logger.log_hyperparams(cfg)
+
+    trainer = Trainer(
+        default_root_dir=Path.cwd(),
+
+        # num_nodes=cfg.training.num_gpus,
+        accelerator=cfg.trainer.accelerator,
+        precision=16 if cfg.trainer.use_amp else 32,
 
 
-def get_model(
-    cfg: TrainConfig | InferenceConfig,
-    feature_dim: int,
-    n_classes: int,
-    num_timesteps: int,
-    test: bool = False,
-) -> BaseModel:
-    model: BaseModel
-    if cfg.model.name == "Spec2DCNN":
-        feature_extractor = get_feature_extractor(
-            cfg.feature_extractor, feature_dim, num_timesteps
-        )
-        decoder = get_decoder(cfg.decoder, feature_extractor.height, n_classes, num_timesteps)
-        model = Spec2DCNN(
-            feature_extractor=feature_extractor,
-            decoder=decoder,
-            in_channels=feature_extractor.out_chans,
-            mixup_alpha=cfg.aug.mixup_alpha,
-            cutmix_alpha=cfg.aug.cutmix_alpha,
-            encoder_weights=cfg.model.params["encoder_weights"] if not test else None,
-            encoder_name=cfg.model.params["encoder_name"],
-        )
-    elif cfg.model.name == "Spec1D":
-        feature_extractor = get_feature_extractor(
-            cfg.feature_extractor, feature_dim, num_timesteps
-        )
-        decoder = get_decoder(cfg.decoder, feature_extractor.height, n_classes, num_timesteps)
-        model = Spec1D(
-            feature_extractor=feature_extractor,
-            decoder=decoder,
-            mixup_alpha=cfg.aug.mixup_alpha,
-            cutmix_alpha=cfg.aug.cutmix_alpha,
-        )
-    elif cfg.model.name == "DETR2DCNN":
-        feature_extractor = get_feature_extractor(
-            cfg.feature_extractor, feature_dim, num_timesteps
-        )
-        decoder = get_decoder(
-            cfg.decoder, feature_extractor.height, cfg.model.params["hidden_dim"], num_timesteps
-        )
-        model = DETR2DCNN(
-            feature_extractor=feature_extractor,
-            decoder=decoder,
-            in_channels=feature_extractor.out_chans,
-            mixup_alpha=cfg.aug.mixup_alpha,
-            cutmix_alpha=cfg.aug.cutmix_alpha,
-            encoder_weights=cfg.model.params["encoder_weights"] if not test else None,
-            encoder_name=cfg.model.params["encoder_name"],
-            max_det=cfg.model.params["max_det"],
-            hidden_dim=cfg.model.params["hidden_dim"],
-            nheads=cfg.model.params["nheads"],
-            num_encoder_layers=cfg.model.params["num_encoder_layers"],
-            num_decoder_layers=cfg.model.params["num_decoder_layers"],
-        )
-    else:
-        raise ValueError(f"Invalid model name: {cfg.model.name}")
+        fast_dev_run=cfg.trainer.debug,  # run only 1 train batch and 1 val batch
+        max_epochs=cfg.trainer.epochs,
+        max_steps=cfg.trainer.epochs * len(datamodule.train_dataloader()),
+        gradient_clip_val=cfg.trainer.gradient_clip_val,
+        accumulate_grad_batches=cfg.trainer.accumulate_grad_batches,
+        callbacks=[checkpoint_cb, lr_monitor, progress_bar, model_summary],
+        logger=pl_logger,
+        
+        # resume_from_checkpoint=resume_from,
+        num_sanity_val_steps=0,
+        log_every_n_steps=int(len(datamodule.train_dataloader()) * 0.1),
+        sync_batchnorm=True,
+        check_val_every_n_epoch=cfg.trainer.check_val_every_n_epoch,
+    )
 
-    return model
+    trainer.fit(model, datamodule=datamodule)
+
+    # load best weights
+    model = model.load_from_checkpoint(
+        checkpoint_cb.best_model_path,
+        cfg=cfg,
+        val_event_df=datamodule.valid_event_df,
+        feature_dim=len(cfg.features),
+        num_classes=len(cfg.labels),
+        duration=cfg.duration,
+    )
+    weights_path = str("model_weights.pth")  # type: ignore
+    LOGGER.info(f"Extracting and saving best weights: {weights_path}")
+    torch.save(model.model.state_dict(), weights_path)
+
+    return
+
+
+if __name__ == "__main__":
+    main()
