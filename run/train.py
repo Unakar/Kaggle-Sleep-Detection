@@ -10,7 +10,7 @@ from pytorch_lightning.callbacks import (
     RichModelSummary,
     RichProgressBar,
 )
-from pytorch_lightning.loggers import WandbLogger
+# from pytorch_lightning.loggers import WandbLogger
 import sys
 sys.path.append("../src")
 from conf import TrainConfig
@@ -47,11 +47,11 @@ def main(cfg: TrainConfig):
     model_summary = RichModelSummary(max_depth=2)
 
     # init experiment logger
-    pl_logger = WandbLogger(
-        name=cfg.exp_name,
-        project="child-mind-institute-detect-sleep-states",
-    )
-    pl_logger.log_hyperparams(cfg)
+    # pl_logger = WandbLogger(
+    #     name=cfg.exp_name,
+    #     project="child-mind-institute-detect-sleep-states",
+    # )
+    # pl_logger.log_hyperparams(cfg)
 
     trainer = Trainer(
         default_root_dir=Path.cwd(),
@@ -67,7 +67,7 @@ def main(cfg: TrainConfig):
         gradient_clip_val=cfg.trainer.gradient_clip_val,
         accumulate_grad_batches=cfg.trainer.accumulate_grad_batches,
         callbacks=[checkpoint_cb, lr_monitor, progress_bar, model_summary],
-        logger=pl_logger,
+        # logger=pl_logger,
         
         # resume_from_checkpoint=resume_from,
         num_sanity_val_steps=0,
