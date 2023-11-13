@@ -71,7 +71,7 @@ class BaseModel(nn.Module):
         labels: Optional[torch.Tensor] = None,
         do_mixup: bool = False,
         do_cutmix: bool = False,
-    ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
+    ) -> torch.Tensor: #| tuple[torch.Tensor, torch.Tensor]:
         """Forward pass of the model.
 
         Args:

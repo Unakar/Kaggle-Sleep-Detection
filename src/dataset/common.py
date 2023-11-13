@@ -5,9 +5,9 @@ from src.conf import InferenceConfig, TrainConfig
 from src.dataset.detr import DETRTestDataset, DETRTrainDataset, DETRValidDataset
 from src.dataset.seg import SegTestDataset, SegTrainDataset, SegValidDataset
 
-TRAIN_DATASET_TYPE = SegTrainDataset | DETRTrainDataset
-VALID_DATASET_TYPE = SegValidDataset | DETRValidDataset
-TEST_DATASET_TYPE = SegTestDataset | DETRTestDataset
+TRAIN_DATASET_TYPE = SegTrainDataset #| DETRTrainDataset
+VALID_DATASET_TYPE = SegValidDataset #| DETRValidDataset
+TEST_DATASET_TYPE = SegTestDataset #| DETRTestDataset
 
 
 def get_train_ds(

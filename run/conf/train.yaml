@@ -21,7 +21,7 @@ defaults:
 seed: 42
 exp_name: dummy
 batch_size: 32
-num_workers: 24
+num_workers: 8
 duration: 5760 # duration * 5 = 秒数
 downsample_rate: 2
 upsample_rate: 1

@@ -31,7 +31,7 @@ class Spec1D(BaseModel):
         labels: Optional[torch.Tensor] = None,
         do_mixup: bool = False,
         do_cutmix: bool = False,
-    ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
+    ) -> torch.Tensor :#| tuple[torch.Tensor, torch.Tensor]:
         x = self.feature_extractor(x)  # (batch_size, n_channels, height, n_timesteps)
 
         if do_mixup and labels is not None:
