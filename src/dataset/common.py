@@ -1,9 +1,10 @@
 import numpy as np
 import polars as pl
-
-from src.conf import InferenceConfig, TrainConfig
-from src.dataset.detr import DETRTestDataset, DETRTrainDataset, DETRValidDataset
-from src.dataset.seg import SegTestDataset, SegTrainDataset, SegValidDataset
+import sys
+sys.path.append("../")
+from conf import InferenceConfig, TrainConfig
+from dataset.detr import DETRTestDataset, DETRTrainDataset, DETRValidDataset
+from dataset.seg import SegTestDataset, SegTrainDataset, SegValidDataset
 
 TRAIN_DATASET_TYPE = SegTrainDataset #| DETRTrainDataset
 VALID_DATASET_TYPE = SegValidDataset #| DETRValidDataset

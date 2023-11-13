@@ -6,9 +6,9 @@ import polars as pl
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader
 
-from src.conf import TrainConfig
-from src.dataset.common import get_train_ds, get_valid_ds
-from src.utils.common import pad_if_needed
+from conf import TrainConfig
+from dataset.common import get_train_ds, get_valid_ds
+from utils.common import pad_if_needed
 
 
 ###################
