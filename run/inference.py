@@ -7,14 +7,15 @@ import torch
 from pytorch_lightning import seed_everything
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-
-from src.conf import InferenceConfig
-from src.datamodule import load_chunk_features
-from src.dataset.common import get_test_ds
-from src.models.base import BaseModel
-from src.models.common import get_model
-from src.utils.common import nearest_valid_size, trace
-from src.utils.post_process import post_process_for_seg
+import sys
+sys.path.append("../src")
+from conf import InferenceConfig
+from datamodule import load_chunk_features
+from dataset.common import get_test_ds
+from models.base import BaseModel
+from models.common import get_model
+from utils.common import nearest_valid_size, trace
+from utils.post_process import post_process_for_seg
 
 
 def load_model(cfg: InferenceConfig) -> BaseModel:
