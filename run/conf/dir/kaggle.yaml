@@ -1,5 +1,5 @@
 data_dir: /kaggle/input/child-mind-institute-detect-sleep-states
 processed_dir: /kaggle/working/processed_data
 output_dir: /kaggle/working/output
-model_dir: /kaggle/input/best_model
+model_dir: /kaggle/input/best_pth
 sub_dir: /kaggle/working
