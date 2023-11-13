@@ -3,7 +3,7 @@ from pathlib import Path
 import hydra
 import polars as pl
 
-from src.conf import PrepareDataConfig
+from conf import PrepareDataConfig
 
 
 @hydra.main(config_path="conf", config_name="prepare_data", version_base="1.2")

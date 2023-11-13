@@ -5,7 +5,8 @@ import hydra
 import numpy as np
 import polars as pl
 from tqdm import tqdm
-
+import sys
+sys.path.append("../src")
 from src.conf import PrepareDataConfig
 from src.utils.common import trace
 
