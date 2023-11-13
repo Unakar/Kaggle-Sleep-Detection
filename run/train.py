@@ -1,20 +1,21 @@
 from typing import Union
 
 import torch.nn as nn
-
-from src.conf import DecoderConfig, FeatureExtractorConfig, InferenceConfig, TrainConfig
-from src.models.base import BaseModel
-from src.models.decoder.lstmdecoder import LSTMDecoder
-from src.models.decoder.mlpdecoder import MLPDecoder
-from src.models.decoder.transformerdecoder import TransformerDecoder
-from src.models.decoder.unet1ddecoder import UNet1DDecoder
-from src.models.detr2D import DETR2DCNN
-from src.models.feature_extractor.cnn import CNNSpectrogram
-from src.models.feature_extractor.lstm import LSTMFeatureExtractor
-from src.models.feature_extractor.panns import PANNsFeatureExtractor
-from src.models.feature_extractor.spectrogram import SpecFeatureExtractor
-from src.models.spec1D import Spec1D
-from src.models.spec2Dcnn import Spec2DCNN
+import sys 
+sys.path.append("../src")
+from conf import DecoderConfig, FeatureExtractorConfig, InferenceConfig, TrainConfig
+from models.base import BaseModel
+from models.decoder.lstmdecoder import LSTMDecoder
+from models.decoder.mlpdecoder import MLPDecoder
+from models.decoder.transformerdecoder import TransformerDecoder
+from models.decoder.unet1ddecoder import UNet1DDecoder
+from models.detr2D import DETR2DCNN
+from models.feature_extractor.cnn import CNNSpectrogram
+from models.feature_extractor.lstm import LSTMFeatureExtractor
+from models.feature_extractor.panns import PANNsFeatureExtractor
+from models.feature_extractor.spectrogram import SpecFeatureExtractor
+from models.spec1D import Spec1D
+from models.spec2Dcnn import Spec2DCNN
 
 FEATURE_EXTRACTOR_TYPE = Union[
     CNNSpectrogram, PANNsFeatureExtractor, LSTMFeatureExtractor, SpecFeatureExtractor
@@ -80,7 +81,7 @@ def get_decoder(
 
 
 def get_model(
-    cfg: TrainConfig | InferenceConfig,
+    cfg: TrainConfig ,#| InferenceConfig,
     feature_dim: int,
     n_classes: int,
     num_timesteps: int,

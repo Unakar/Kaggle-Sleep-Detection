@@ -1,0 +1,5 @@
+data_dir: D:/Code/kaggle_data
+processed_dir: D:/Code/kaggle_data/processed_data
+output_dir: D:/Code/kaggle/output
+model_dir: D:/Code/kaggle/output/train
+sub_dir: ./

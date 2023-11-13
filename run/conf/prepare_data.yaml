@@ -11,6 +11,6 @@ hydra:
 
 defaults:
   - _self_
-  - dir: local
+  - dir: your
 
 phase: train
