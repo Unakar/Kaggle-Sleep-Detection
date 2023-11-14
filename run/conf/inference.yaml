@@ -17,7 +17,7 @@ defaults:
   - feature_extractor: CNNSpectrogram
   - decoder: UNet1DDecoder
 
-exp_name: exp1
+exp_name: dummy
 phase: test
 weight:
   exp_name: ${exp_name}
