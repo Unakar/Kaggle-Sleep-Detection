@@ -40,7 +40,7 @@ def main(cfg: TrainConfig):
         monitor=cfg.trainer.monitor,
         mode=cfg.trainer.monitor_mode,
         save_top_k=1,
-        save_last=False,
+        save_last=True,
     )
     lr_monitor = LearningRateMonitor("epoch")
     progress_bar = RichProgressBar()
@@ -76,7 +76,7 @@ def main(cfg: TrainConfig):
     )
 
     trainer.fit(model, datamodule=datamodule)
-    # ckpt_path = "/home/aistudio/output/train/dummy/single/lightning_logs/.../checkpoints/**.ckpt"
+    # ckpt_path = "/home/aistudio/output/train/dummy/single/lightning_logs/.../checkpoints/last.ckpt"
     # trainer.fit(model, datamodule=datamodule, ckpt_path=ckpt_path) //提供加载断点的方式
     # load best weights
     model = model.load_from_checkpoint(
