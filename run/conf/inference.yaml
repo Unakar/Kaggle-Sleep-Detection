@@ -11,13 +11,13 @@ hydra:
 
 defaults:
   - _self_
-  - dir: local
+  - dir: kaggle
   - dataset: seg
   - model: Spec2DCNN
   - feature_extractor: CNNSpectrogram
   - decoder: UNet1DDecoder
 
-exp_name: dummy
+exp_name: exp1
 phase: test
 weight:
   exp_name: ${exp_name}
